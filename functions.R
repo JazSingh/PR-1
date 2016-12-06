@@ -7,3 +7,10 @@ splitData <- function(digitData, sampleSize){
   c(digitData[sample,], digitData[-sample,])
 }
 
+loadData <- function() {
+  data.frame(read.csv("Dataset/mnist.csv"))
+}
+
+getDigits <- function(digitData) {
+  as.factor(digitData$label)
+}
