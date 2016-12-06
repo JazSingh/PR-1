@@ -19,11 +19,17 @@ testset = dataset[-c(randomRows),]
 # 
 # length(trainingset.0)
 
+
+density <- function(argument){
+  return (rowMeans(argument))
+}
+
 # get mean per digit
 
 digits <- as.factor(mnist$label)
-agg <- aggregate(x = mnist[, 2:ncol(mnist)], by = list(digits), FUN = "mean", na.rm = T)
+agg <- aggregate(x = mnist[, 2:ncol(mnist)], by = list(digits), mean, na.rm = T)
 digitMeans <- rowMeans(agg[2:ncol(agg)])
 show('Digit means:');
 show(digitMeans)
+
 
