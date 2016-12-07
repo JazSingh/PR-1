@@ -4,7 +4,14 @@ filterData <- function(digitData, filter){
 
 splitData <- function(digitData, sampleSize){
   sample <- sample(nrow(digitData),sampleSize, replace = FALSE)
-  c(digitData[sample,], digitData[-sample,])
+}
+
+trainData <- function(digitData, sample){
+  digitData[sample,]
+}
+
+testData <- function(digitData, sample){
+  digitData[-sample,]
 }
 
 loadData <- function() {
@@ -14,3 +21,4 @@ loadData <- function() {
 getDigits <- function(digitData) {
   as.factor(digitData$label)
 }
+
