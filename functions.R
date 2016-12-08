@@ -25,7 +25,6 @@ buildQuantiles <- function(digitData) {
   data.frame(df)
 }
 
-
 trainData <- function(digitData, sample){
   digitData[sample,]
 }
@@ -100,19 +99,17 @@ Queue <- setRefClass(Class = "Queue",
 )
 
 getPlanes <- function(digitData) {
-  #number of planes of inactive pixels
-  visited = list() #counter to store already visited pixels
+  visited = list() 
   planes = 0
   for( x in 1:28) {
     for(y in 1:28) {
-      if (digitData[x+28*y] == 0 && visited[x+28*y] == 0){ #if a non-active has never been visited perform a bfs the get all adjacent inactive pixels
-        #print "=====New Plane=====", (x,y)
+      if (digitData[x+28*y] == 0 && visited[x+28*y] == 0){ 
         planes = planes+1
       }
       Queue = Queue$new()
-      Queue.push(x+28*y) #initialize bfs-visit
+      Queue.push(x+28*y) 
       visited[x+28*y] = 1
-      while (!Queue.isEmpty()){ #BFS-visit to find all adjacent inactive pixels
+      while (!Queue.isEmpty()){ 
         current = Queue.pop()
       }
       successors = list()
@@ -126,4 +123,3 @@ getPlanes <- function(digitData) {
   }
   return(planes)
 }
->>>>>>> 2e3469e2416b61b06d302db9aa3d13318d5421f2
