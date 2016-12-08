@@ -4,7 +4,7 @@ filterData <- function(digitData, filter){
 
 splitData <- function(digitData, sampleSize){
   sample <- sample(nrow(digitData),sampleSize, replace = FALSE)
-  c(digitData[sample,], digitData[-sample,])
+  digitData[sample,]
 }
 
 loadData <- function() {
@@ -23,14 +23,6 @@ buildQuantiles <- function(digitData) {
     df <- rbind(df, de)
   }
   data.frame(df)
-}
-
-trainData <- function(digitData, sample){
-  digitData[sample,]
-}
-
-testData <- function(digitData, sample){
-  digitData[-sample,]
 }
 
 getMinimum <- function(digitData) {
