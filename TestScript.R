@@ -1,35 +1,27 @@
-dataset <- read.csv("Dataset/mnist.csv")  # read csv file 
+# COMPLETE CODE FOR PROJECT
 
+digit.data <- read.csv("Dataset/mnist.csv")  # read csv file 
+digit.data <- digit.data[,-c(feature.filter)]
+
+# create a factor of $label
+digit.data$label = as.factor(digit.data$label)
+
+# add density feature to the dataset
+digit.data$density = rowMeans(digit.data[,-c(1)])
+
+# setup multinomial logit model, which predicts the label using the density feature
+digit.data.multinom = multinom(digit.data$label~ scale(digit.data$density), digit.data$label, maxit=1000)
+
+# predict the label of a digit using this model
+digit.data.pred <- predict(digit.data.multinom, digit.data[,-c(1)], type="class")
+
+# create a confusion matrix from this prediction
+confmat <- table(digit.data$label, digit.data.pred)
+
+# create trainingset and testset
 set.seed(1)
 
 randomRows = sample(1:1000)
-trainingset = dataset[randomRows,]
-testset = dataset[-c(randomRows),]
-# 
-# trainingset.0 <- trainingset[which(trainingset[,1] == 0),]
-# trainingset.1 <- trainingset[which(trainingset[,1] == 1),]
-# trainingset.2 <- trainingset[which(trainingset[,1] == 2),]
-# trainingset.3 <- trainingset[which(trainingset[,1] == 3),]
-# trainingset.4 <- trainingset[which(trainingset[,1] == 4),]
-# trainingset.5 <- trainingset[which(trainingset[,1] == 5),]
-# trainingset.6 <- trainingset[which(trainingset[,1] == 6),]
-# trainingset.7 <- trainingset[which(trainingset[,1] == 7),]
-# trainingset.8 <- trainingset[which(trainingset[,1] == 8),]
-# trainingset.9 <- trainingset[which(trainingset[,1] == 9),]
-# 
-# length(trainingset.0)
-
-
-density <- function(argument){
-  return (rowMeans(argument))
-}
-
-# get mean per digit
-
-digits <- as.factor(mnist$label)
-agg <- aggregate(x = mnist[, 2:ncol(mnist)], by = list(digits), mean, na.rm = T)
-digitMeans <- rowMeans(agg[2:ncol(agg)])
-show('Digit means:');
-show(digitMeans)
-
-
+digit.trainset = digit.data[randomRows,]
+digit.testset = digit.data[-c(randomRows),]
+rm(randomRows)
