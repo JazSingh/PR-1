@@ -89,25 +89,28 @@ Queue <- setRefClass(Class = "Queue",
 
 getPlanes <- function(digitData) {
   #number of planes of inactive pixels
-  visited = Counter() #counter to store already visited pixels
+  visited = list() #counter to store already visited pixels
   planes = 0
   for( x in 1:28) {
     for(y in 1:28) {
-    if (digitData[x+28*y] == 0 and visited[x+28*y] == 0){ #if a non-active has never been visited perform a bfs the get all adjacent inactive pixels
-    #print "=====New Plane=====", (x,y)
-    planes += 1
+      if (digitData[x+28*y] == 0 && visited[x+28*y] == 0){ #if a non-active has never been visited perform a bfs the get all adjacent inactive pixels
+        #print "=====New Plane=====", (x,y)
+        planes = planes+1
+      }
+      Queue = Queue$new()
+      Queue.push(x+28*y) #initialize bfs-visit
+      visited[x+28*y] = 1
+      while (!Queue.isEmpty()){ #BFS-visit to find all adjacent inactive pixels
+        current = Queue.pop()
+      }
+      successors = list()
+      for (z in successors) {
+        if (visited[z] == 0){
+          Queue.push(z)
+        }
+      }
+      visited[z] = 1 
     }
-  Queue = Queue()
-  Queue.push(x+28*y) #initialize bfs-visit
-  visited[x+28*y] = 1
-  while not Queue.isEmpty(): #BFS-visit to find all adjacent inactive pixels
-    current = Queue.pop()
-  successors = list()
-  for (z in successors) {
-    if visited[z] == 0:
-    Queue.push(z)
   }
-  visited[z] = 1 
-    }
-  }
+  return(planes)
 }
