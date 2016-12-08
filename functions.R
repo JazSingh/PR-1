@@ -14,3 +14,13 @@ loadData <- function() {
 getDigits <- function(digitData) {
   as.factor(digitData$label)
 }
+
+buildQuantiles <- function(digitData) {
+  cols <- c(0,.25, .50, .75, .90, .95, .99,1)
+  df <- matrix(ncol = 8)
+  for(pixel in 2:ncol(digitData)){
+    de <- quantile(digitData[, pixel], cols)
+    df <- rbind(df, de)
+  }
+  data.frame(df)
+}
