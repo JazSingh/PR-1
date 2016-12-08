@@ -37,20 +37,6 @@ getMinimum <- function(digitData) {
   return(1)   
 }
 
-#function to determine neighbours which are inactive by looking in all 8 directions
-inactiveNeighbours <- function(x, y, digitData){
-  inactiveNeighbours = list()
-  w = 28
-  h = 28
-  
-  wmin = x - 1 
-  wmax = x + 1 
-  hmin = y - 1 
-  hmax = y + 1
-  
-return(inactiveNeighbours)
-}
-
 Queue <- setRefClass(Class = "Queue",
    fields = list(
      name = "character",
@@ -98,27 +84,78 @@ Queue <- setRefClass(Class = "Queue",
    )
 )
 
-getPlanes <- function(digitData) {
-  visited = list() 
-  planes = 0
-  for( x in 1:28) {
-    for(y in 1:28) {
-      if (digitData[x+28*y] == 0 && visited[x+28*y] == 0){ 
-        planes = planes+1
-      }
-      Queue = Queue$new()
-      Queue.push(x+28*y) 
-      visited[x+28*y] = 1
-      while (!Queue.isEmpty()){ 
-        current = Queue.pop()
-      }
-      successors = list()
-      for (z in successors) {
-        if (visited[z] == 0){
-          Queue.push(z)
+#function to determine neighbours which are inactive by looking in all 8 directions
+inactiveNeighbours <- function(index, digit){
+  inactive <- c()
+  
+  start <- 2
+  
+  i <- index - 2
+  x <- i %% 28 + 1
+  y <- i %/% 28 + 1
+  
+  left <- index - 1
+  right <- index + 1
+  up <- index - 28
+  down <- index + 28
+  
+  lup <- up - 1
+  rup <- up + 1
+  ldown <- down - 1
+  rdown <- down + 1
+  
+  if(x - 1 > 0 && digit[left] == 0) {
+    inactive <- c(inactive, left)
+  }
+  if(x + 1 < 29 && digit[right] == 0) {
+    inactive <- c(inactive, right)
+  }
+  if(y - 1 > 0 && digit[up] == 0) {
+    inactive <- c(inactive, up)
+  }
+  if(y + 1 < 29 && digit[down] == 0) {
+    inactive <- c(inactive, down)
+  }
+  
+  if(x - 1 > 0 && y - 1 > 0 && digit[lup] == 0) {
+    inactive <- c(inactive, lup)
+  }
+  
+  if(x + 1 < 29 && y - 1 > 0 && digit[rup] == 0) {
+    inactive <- c(inactive, rup)
+  }
+  
+  if(x - 1 > 0 && y + 1 < 29 && digit[ldown] == 0) {
+    inactive <- c(inactive, ldown)
+  }
+  
+  if(x + 1 < 29 && y + 1 < 29 && digit[rdown] == 0) {
+    inactive <- c(inactive, rdown)
+  }
+  inactive <- sort(inactive)
+  return(inactive)
+}
+
+getPlanes <- function(digit) {
+  visited <- c(1)
+  planes <- 0
+  start <- 2
+  for(x in 2:length(digit)) {
+    if(digit[x] == 0 && !is.element(x, visited)) {
+      planes <- planes + 1
+      queue <- Queue$new()
+      queue$push(x)
+      visited <- c(visited, x)
+      while(queue$size() != 0) {
+        current <- queue$pop()
+        successors <- inactiveNeighbours(current, digit)
+        for(z in successors){
+          if(!is.element(z, visited)){
+            queue$push(z)
+            visited <- c(visited, z)
+          }
         }
       }
-      visited[z] = 1 
     }
   }
   return(planes)
