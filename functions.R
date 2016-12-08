@@ -3,8 +3,8 @@ filterData <- function(digitData, filter){
 }
 
 splitData <- function(digitData, sampleSize){
-  sample <- sample(nrow(digitData),sampleSize, replace = FALSE)
-  digitData[sample,]
+  sample <- sample(nrow(digitData),2*sampleSize, replace = FALSE)
+  return(sample)
 }
 
 loadData <- function() {
