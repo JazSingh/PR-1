@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 filterData <- function(digitData, filter){
   digitData[,-filter]
 }
@@ -153,6 +154,8 @@ getPlanes <- function(digit) {
   }
   return(planes)
 =======
+=======
+>>>>>>> 40ff4e8871c86ef63db61b13d195802e0d9cfd02
 filterData <- function(digitData, filter){
   digitData[,-filter]
 }
@@ -178,18 +181,6 @@ buildQuantiles <- function(digitData) {
     df <- rbind(df, de)
   }
   data.frame(df)
-}
-
-trainData <- function(digitData, sample){
-  digitData[sample,]
-}
-
-testData <- function(digitData, sample){
-  digitData[-sample,]
-}
-
-getMinimum <- function(digitData) {
-  return(1)   
 }
 
 Queue <- setRefClass(Class = "Queue",
@@ -314,5 +305,8 @@ getPlanes <- function(digit) {
     }
   }
   return(planes)
+<<<<<<< HEAD
 >>>>>>> d4fff1284f2396e7c9afaec23c5109825369f7f4
+=======
+>>>>>>> 40ff4e8871c86ef63db61b13d195802e0d9cfd02
 }
