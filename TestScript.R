@@ -65,7 +65,7 @@ digit.trainset.pred.combi <- predict(digit.multinom.combi, digit.trainset[,-c(1)
 digit.testset.pred.combi <- predict(digit.multinom.combi, digit.testset[,-c(1)], type="class")
 
 print("kNN")
-kNN <- nnExecAll(digit.trainset, digit.testset, 1:75)
+kNN <- nnExecAll(digit.trainset, digit.testset, 1:13)
 #kNN.plot <- plot(kNN)
 
 print('Finished.')
