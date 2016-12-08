@@ -151,3 +151,54 @@ splitData <- function(digitData, sampleSize){
   sample <- sample(nrow(digitData),2*sampleSize, replace = FALSE)
   return(sample)
 }
+
+boundingBoxRatio <- function(digitData) {
+  xmax <- 0
+  ymax <- 0
+  xmin <- 28
+  ymin <- 28
+  
+  for(p in 2:length(digitData)) {
+    if(digitData[p] > 0) {
+      x <- p %% 28
+      y <- p %/% 28
+      xmin <- min(xmin, x)
+      xmax <- max(xmax, x)
+      ymax <- max(ymax, y)
+      ymin <- min(ymin, y)
+    }
+  }
+  return((xmax - xmin)  / (ymax - ymin))
+}
+
+acc <- function(confmat) {
+  return(sum(diag(confmat))/sum(confmat))
+}
+
+nnExec <- function(trainset, testset, kn) {
+  library(class)
+  print(paste("kNN:", kn, sep=" "))
+  
+  trainset.knn <- knn(train = trainset, test = trainset, cl = trainset$label, k =  kn)
+  trainset.confm <-  table(trainset$label, trainset.knn)
+  trainset.acc <- acc(trainset.confm)
+  
+  testset.knn <- knn(train = trainset, test = testset, cl = trainset$label, k =  kn)
+  testset.confm <-  table(testset$label, testset.knn)
+  testset.acc <- acc(testset.confm)
+  
+  return(c(trainset.acc, testset.acc))
+}
+
+nnExecAll <- function(trainset, testset, kns){
+  k <- c()
+  train.acc <- c()
+  test.acc <- c()
+  for(kn in kns){
+    res <- nnExec(trainset, testset, kn)
+    k <- c(k,kn)
+    train.acc <- c(train.acc, res[1])
+    test.acc <- c(test.acc, res[2])
+  }
+  return(data.frame(k,train.acc, test.acc))
+}
