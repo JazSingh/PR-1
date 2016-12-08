@@ -25,10 +25,6 @@ buildQuantiles <- function(digitData) {
   data.frame(df)
 }
 
-getMinimum <- function(digitData) {
-  return(1)   
-}
-
 Queue <- setRefClass(Class = "Queue",
    fields = list(
      name = "character",

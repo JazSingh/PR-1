@@ -22,6 +22,7 @@ digit.testset$planes <- apply(digit.testset, 1, getPlanes)
 
 print('Compute which pixels are irrelevant and removes them from the train- and testset.')
 colMeans <- colMeans(digit.data[,-c(1)])
+
 feature.filter <- which(colMeans == 0) + 1
 digit.trainset <- digit.trainset[,-c(feature.filter)]
 digit.testset <- digit.testset[,-c(feature.filter)]
