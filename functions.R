@@ -20,9 +20,7 @@ buildQuantiles <- function(digitData) {
   data.frame(df)
 }
 
-getMinimum <- function(digitData) {
-  return(1)   
-}
+# Queue class implementation, source: https://www.r-bloggers.com/implementing-a-queue-as-a-reference-class/
 
 Queue <- setRefClass(Class = "Queue",
    fields = list(
@@ -147,6 +145,7 @@ getPlanes <- function(digit) {
   }
   return(planes)
 }
+
 splitData <- function(digitData, sampleSize){
   sample <- sample(nrow(digitData),2*sampleSize, replace = FALSE)
   return(sample)
