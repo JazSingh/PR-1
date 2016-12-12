@@ -176,7 +176,6 @@ acc <- function(confmat) {
 }
 
 nnExec <- function(trainset, testset, kn) {
-  library(class)
   print(paste("kNN:", kn, sep=" "))
   
   trainset.knn <- knn(train = trainset, test = trainset, cl = trainset$label, k =  kn)
@@ -191,6 +190,7 @@ nnExec <- function(trainset, testset, kn) {
 }
 
 nnExecAll <- function(trainset, testset, kns){
+  library(class)
   k <- c()
   train.acc <- c()
   test.acc <- c()

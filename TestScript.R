@@ -34,6 +34,9 @@ feature.filter <- which(colMeans == 0) + 1
 digit.trainset <- digit.trainset[,-c(feature.filter)]
 digit.testset <- digit.testset[,-c(feature.filter)]
 
+digit.trainset.features <- data.frame(digit.trainset$label, digit.trainset$boundingboxratio, digit.trainset$density, digit.trainset$planes)
+digit.testset.features <- data.frame(digit.testset$label, digit.testset$boundingboxratio, digit.testset$density, digit.testset$planes)
+
 library(nnet)
 print("Multinomial classification")
 # setup multinomial logit model, which predicts the label using the density feature
