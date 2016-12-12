@@ -3,9 +3,6 @@ print('Load dataset.')
 source('functions.R')
 digit.data <- read.csv("Dataset/mnist.csv")  # read csv file 
 
-# create a factor of $label
-digit.data$label = as.factor(digit.data$label)
-
 print('Compute pixel density.')
 # add density feature to the dataset
 digit.data$density = rowMeans(digit.data[,-c(1)])
@@ -26,6 +23,10 @@ digit.trainset$boundingboxratio = apply(digit.trainset, 1, boundingBoxRatio)
 print('Compute bounding box ratio for testset.')
 digit.testset$boundingboxratio = apply(digit.testset, 1, boundingBoxRatio)
 
+# create a factor of $label
+digit.data$label = as.factor(digit.data$label)
+digit.trainset$label = as.factor(digit.trainset$label)
+digit.testset$label = as.factor(digit.testset$label)
 
 print('Compute which pixels are irrelevant and removes them from the train- and testset.')
 colMeans <- colMeans(digit.data[,-c(1)])
