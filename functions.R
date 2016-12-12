@@ -202,3 +202,32 @@ nnExecAll <- function(trainset, testset, kns){
   }
   return(data.frame(k,train.acc, test.acc))
 }
+
+svmExec <- function(trainset, testset, cost){
+  print(paste("kNN:", kn, sep=" "))
+  
+  trainset.svm <- knn(train = trainset, test = trainset, cl = trainset$label, k =  kn)
+  trainset.confm <-  table(trainset$label, trainset.knn)
+  trainset.acc <- acc(trainset.confm)
+  
+  testset.svm <- knn(train = trainset, test = testset, cl = trainset$label, k =  kn)
+  testset.confm <-  table(testset$label, testset.knn)
+  testset.acc <- acc(testset.confm)
+  
+  return(c(trainset.acc, testset.acc))
+}
+
+svmExecAll <- function(trainset, testset, costRange) {
+  library(e1071)
+  library(rpart)
+  cost <- c()
+  train.acc <- c()
+  test.acc <- c()
+  for(c in costRange){
+    res <- svmExec(trainset, testset, cost)
+    cost <- c(cost,c)
+    train.acc <- c(train.acc, res[1])
+    test.acc <- c(test.acc, res[2])
+  }
+  return(data.frame(cost,train.acc, test.acc))
+}
