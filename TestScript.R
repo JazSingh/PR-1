@@ -47,40 +47,39 @@ digit.testset.features <- data.frame(label, boundingboxratio, density, planes)
 library(nnet)
 print("Multinomial classification")
 # setup multinomial logit model, which predicts the label using the density feature
-digit.multinom.density <- multinom(digit.trainset$label~ scale(digit.trainset$density), digit.trainset, maxit=1000)
+digit.multinom.density <- multinom(label~ scale(density), digit.trainset, maxit=1000)
 # predict the labels in the trainset using the multinom model (Density)
 digit.trainset.pred.density <- predict(digit.multinom.density, digit.trainset[,-c(1)], type="class")
 # predict the labels in the testset using the multinom model (Density)
 digit.testset.pred.density <- predict(digit.multinom.density, digit.testset[,-c(1)], type="class")
 
 # setup multinomial logit model, which predicts the label using the plane feature
-digit.multinom.planes <- multinom(digit.trainset$label~ digit.trainset$planes, digit.trainset, maxit=1000)
+digit.multinom.planes <- multinom(label~ planes, digit.trainset, maxit=1000)
 # predict the labels in the trainset using the multinom model (Plane)
 digit.trainset.pred.planes <- predict(digit.multinom.planes, digit.trainset[,-c(1)], type="class")
 # predict the labels in the testset using the multinom model (Plane)
 digit.testset.pred.planes <- predict(digit.multinom.planes, digit.testset[,-c(1)], type="class")
 
 # setup multinomial logit model, which predicts the label using the plane feature
-digit.multinom.boundingboxratio <- multinom(digit.trainset$label~ digit.trainset$boundingboxratio, digit.trainset, maxit=1000)
+digit.multinom.boundingboxratio <- multinom(label~ boundingboxratio, digit.trainset, maxit=1000)
 # predict the labels in the trainset using the multinom model (Plane)
 digit.trainset.pred.boundingboxratio<- predict(digit.multinom.boundingboxratio, digit.trainset[,-c(1)], type="class")
 # predict the labels in the testset using the multinom model (Plane)
 digit.testset.pred.boundingboxratio <- predict(digit.multinom.boundingboxratio, digit.testset[,-c(1)], type="class")
 
 # setup multinomial logit model, which predicts the label using both features
-digit.multinom.combi <- multinom(digit.trainset$label~ scale(digit.trainset$density)+digit.trainset$planes, digit.trainset, maxit=1000)
+digit.multinom.combi <- multinom(label~ scale(density)+ planes, digit.trainset, maxit=1000)
 # predict the labels in the trainset using the multinom model (Density & Plane)
 digit.trainset.pred.combi <- predict(digit.multinom.combi, digit.trainset[,-c(1)], type="class")
 # predict the labels in the testset using the multinom model (Density & Plane)
 digit.testset.pred.combi <- predict(digit.multinom.combi, digit.testset[,-c(1)], type="class")
 
 # setup multinomial logit model, which predicts the label using both features
-digit.multinom.combi.2 <- multinom(digit.trainset$label~ digit.trainset$boundingboxratio+digit.trainset$planes, digit.trainset, maxit=1000)
+digit.multinom.combi.2 <- multinom(label~ boundingboxratio+planes, digit.trainset, maxit=1000)
 # predict the labels in the trainset using the multinom model (Density & Plane)
 digit.trainset.pred.combi.2 <- predict(digit.multinom.combi.2, digit.trainset[,-c(1)], type="class")
 # predict the labels in the testset using the multinom model (Density & Plane)
 digit.testset.pred.combi.2 <- predict(digit.multinom.combi.2, digit.testset[,-c(1)], type="class")
-
 
 print("kNN")
 kNN <- nnExecAll(digit.trainset.features, digit.testset.features, 1:11)
@@ -98,6 +97,11 @@ svm.radial.pred.acc <- sum(diag(table(digit.testset$label,svm.radial.pred)))/nro
 svm.radial.tuned <- svm(label ~ ., data = digit.trainset.features, cost = 8, gamma = 0.1)
 svm.radial.pred.tune <- predict(svm.radial.tuned, digit.testset.features[,-c(1)])
 svm.radial.pred.acc.tune <- sum(diag(table(digit.testset$label,svm.radial.pred.tune)))/nrow(digit.testset.features)
+digit.multinom.all <- multinom(label~ scale(density)+ planes + boundingboxratio, digit.trainset, maxit=1000)
+# predict the labels in the trainset using the multinom model (Density & Plane)
+digit.trainset.pred.all <- predict(digit.multinom.combi, digit.trainset[,-c(1)], type="class")
+# predict the labels in the testset using the multinom model (Density & Plane)
+digit.testset.pred.all <- predict(digit.multinom.combi, digit.testset[,-c(1)], type="class")
 
 print("Linear kernel")
 svm.linear <- svm(label ~ ., data = digit.trainset.features, kernel = "linear")
