@@ -52,6 +52,8 @@ digit.multinom.density <- multinom(label~ scale(density), digit.trainset, maxit=
 digit.trainset.pred.density <- predict(digit.multinom.density, digit.trainset[,-c(1)], type="class")
 # predict the labels in the testset using the multinom model (Density)
 digit.testset.pred.density <- predict(digit.multinom.density, digit.testset[,-c(1)], type="class")
+# compute and save the test set accuracy
+digit.testset.pred.density.acc <- acc(table(digit.testset$label, digit.testset.pred.density))
 
 # setup multinomial logit model, which predicts the label using the plane feature
 digit.multinom.planes <- multinom(label~ planes, digit.trainset, maxit=1000)
@@ -59,6 +61,8 @@ digit.multinom.planes <- multinom(label~ planes, digit.trainset, maxit=1000)
 digit.trainset.pred.planes <- predict(digit.multinom.planes, digit.trainset[,-c(1)], type="class")
 # predict the labels in the testset using the multinom model (Plane)
 digit.testset.pred.planes <- predict(digit.multinom.planes, digit.testset[,-c(1)], type="class")
+# compute and save the test set accuracy
+digit.testset.pred.planes.acc <- acc(table(digit.testset$label, digit.testset.pred.planes))
 
 # setup multinomial logit model, which predicts the label using the plane feature
 digit.multinom.boundingboxratio <- multinom(label~ boundingboxratio, digit.trainset, maxit=1000)
@@ -66,6 +70,8 @@ digit.multinom.boundingboxratio <- multinom(label~ boundingboxratio, digit.train
 digit.trainset.pred.boundingboxratio<- predict(digit.multinom.boundingboxratio, digit.trainset[,-c(1)], type="class")
 # predict the labels in the testset using the multinom model (Plane)
 digit.testset.pred.boundingboxratio <- predict(digit.multinom.boundingboxratio, digit.testset[,-c(1)], type="class")
+# compute and save the test set accuracy
+digit.testset.pred.boundingboxratio.acc <- acc(table(digit.testset$label, digit.testset.pred.boundingboxratio))
 
 # setup multinomial logit model, which predicts the label using both features
 digit.multinom.combi <- multinom(label~ scale(density)+ planes, digit.trainset, maxit=1000)
@@ -73,6 +79,8 @@ digit.multinom.combi <- multinom(label~ scale(density)+ planes, digit.trainset, 
 digit.trainset.pred.combi <- predict(digit.multinom.combi, digit.trainset[,-c(1)], type="class")
 # predict the labels in the testset using the multinom model (Density & Plane)
 digit.testset.pred.combi <- predict(digit.multinom.combi, digit.testset[,-c(1)], type="class")
+# compute and save the test set accuracy
+digit.testset.pred.combi.acc <- acc(table(digit.testset$label, digit.testset.pred.combi))
 
 # setup multinomial logit model, which predicts the label using both features
 digit.multinom.combi.2 <- multinom(label~ boundingboxratio+planes, digit.trainset, maxit=1000)
@@ -80,14 +88,23 @@ digit.multinom.combi.2 <- multinom(label~ boundingboxratio+planes, digit.trainse
 digit.trainset.pred.combi.2 <- predict(digit.multinom.combi.2, digit.trainset[,-c(1)], type="class")
 # predict the labels in the testset using the multinom model (Density & Plane)
 digit.testset.pred.combi.2 <- predict(digit.multinom.combi.2, digit.testset[,-c(1)], type="class")
+# compute and save the test set accuracy
+digit.testset.pred.combi.2.acc <- acc(table(digit.testset$label, digit.testset.pred.combi.2))
 
 digit.multinom.all <- multinom(label~ scale(density)+ planes + boundingboxratio, digit.trainset, maxit=1000)
 # predict the labels in the trainset using the multinom model (Density & Plane)
 digit.trainset.pred.all <- predict(digit.multinom.all, digit.trainset[,-c(1)], type="class")
 # predict the labels in the testset using the multinom model (Density & Plane)
 digit.testset.pred.all <- predict(digit.multinom.all, digit.testset[,-c(1)], type="class")
+# compute and save the test set accuracy
+digit.testset.pred.all.acc <- acc(table(digit.testset$label, digit.testset.pred.all))
 
-# 
+print("Multinom logit with LASSO")
+library(glmnet)
+digit.lasso.cv <- cv.glmnet(as.matrix(digit.trainset[,-c(1)]), digit.trainset[,1], family="multinomial", type.measure="class")
+digit.lasso.cv.pred <- predict(digit.lasso.cv, as.matrix(digit.testset[,-c(1)]), type="class")
+digit.lasso.cv.pred.acc <- acc(table(digit.testset$label, digit.lasso.cv.pred))
+
 # print("kNN")
 # kNN <- nnExecAll(digit.trainset.features, digit.testset.features, 1:11)
 # kNN.plot <- plot(kNN)
