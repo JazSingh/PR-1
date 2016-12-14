@@ -168,7 +168,8 @@ boundingBoxRatio <- function(digitData) {
       ymin <- min(ymin, y)
     }
   }
-  return((xmax - xmin)  / (ymax - ymin))
+  bbox <- ((xmax - xmin)  * (ymax - ymin))
+  return(log(sum(digitData)) / bbox)
 }
 
 acc <- function(confmat) {
@@ -203,15 +204,20 @@ nnExecAll <- function(trainset, testset, kns){
   return(data.frame(k,train.acc, test.acc))
 }
 
-svmExec <- function(trainset, testset, cost){
-  print(paste("kNN:", kn, sep=" "))
+svmExec <- function(trainset, testset){
+  library(e1071)
   
-  trainset.svm <- knn(train = trainset, test = trainset, cl = trainset$label, k =  kn)
-  trainset.confm <-  table(trainset$label, trainset.knn)
+  print(paste("SVM:", c, sep=" "))
+  
+  model <- svm(label ~ ., data = trainset)
+  tuneResult <- tune(model, label ~.,  data = trainset, kernel= "radial", ranges = list(gamma = 2^(-1:1), epsilon = seq(0,1,0.1), cost = 2^(2:9), tunecontrol = tune.control(sampling = "fix")))
+  
+  trainset.svm <-  predict(model, trainset[,c(-1)])
+  trainset.confm <-  table(trainset$label, trainset.svm)
   trainset.acc <- acc(trainset.confm)
   
-  testset.svm <- knn(train = trainset, test = testset, cl = trainset$label, k =  kn)
-  testset.confm <-  table(testset$label, testset.knn)
+  testset.svm <-  predict(model, testset[,c(-1)])
+  testset.confm <-  table(testset$label, testset.svm)
   testset.acc <- acc(testset.confm)
   
   return(c(trainset.acc, testset.acc))
@@ -219,12 +225,11 @@ svmExec <- function(trainset, testset, cost){
 
 svmExecAll <- function(trainset, testset, costRange) {
   library(e1071)
-  library(rpart)
   cost <- c()
   train.acc <- c()
   test.acc <- c()
   for(c in costRange){
-    res <- svmExec(trainset, testset, cost)
+    res <- svmExec(trainset, testset, c)
     cost <- c(cost,c)
     train.acc <- c(train.acc, res[1])
     test.acc <- c(test.acc, res[2])
