@@ -176,32 +176,24 @@ acc <- function(confmat) {
   return(sum(diag(confmat))/sum(confmat))
 }
 
-nnExec <- function(trainset, testset, kn) {
+nnExec <- function(trainset, kn) {
   print(paste("kNN:", kn, sep=" "))
-  
-  trainset.knn <- knn(train = trainset, test = trainset, cl = trainset$label, k =  kn)
-  trainset.confm <-  table(trainset$label, trainset.knn)
-  trainset.acc <- acc(trainset.confm)
-  
-  testset.knn <- knn(train = trainset, test = testset, cl = trainset$label, k =  kn)
-  testset.confm <-  table(testset$label, testset.knn)
-  testset.acc <- acc(testset.confm)
-  
-  return(c(trainset.acc, testset.acc))
+  cv <- knn.cv(trainset, trainset$label, k = kn, prob = FALSE)
+  return(acc(table(trainset$label, cv)))
 }
 
-nnExecAll <- function(trainset, testset, kns){
+nnExecAll <- function(trainset, kns){
   library(class)
   k <- c()
-  train.acc <- c()
-  test.acc <- c()
+  acc <- c()
+  
   for(kn in kns){
-    res <- nnExec(trainset, testset, kn)
+    res <- nnExec(trainset, kn)
     k <- c(k,kn)
-    train.acc <- c(train.acc, res[1])
-    test.acc <- c(test.acc, res[2])
+    acc <- c(acc, res)
   }
-  return(data.frame(k,train.acc, test.acc))
+  
+  return(data.frame(k, acc))
 }
 
 svmExec <- function(trainset, testset){
