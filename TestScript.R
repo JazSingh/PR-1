@@ -36,7 +36,7 @@
 # digit.testset.features$label = as.factor(digit.testset.features$label)
 # 
 # print('Compute which pixels are irrelevant and remove them from the train- and testset. (max == 0)')
-# feature.filter <- which(apply(digit.data, 2, max) == 0) - 2
+# feature.filter <- which(apply(digit.data, 2, max) == 0)
 # digit.trainset <- digit.trainset[,-c(feature.filter)]
 # digit.testset <- digit.testset[,-c(feature.filter)]
 
@@ -101,12 +101,22 @@ digit.lasso.cv <- cv.glmnet(as.matrix(digit.trainset.features[,-c(1)]), digit.tr
 digit.lasso.cv.pred <- predict(digit.lasso.cv, as.matrix(digit.testset.features[,-c(1)]), type="class")
 digit.lasso.cv.pred.acc <- acc(table(digit.testset.features$label, digit.lasso.cv.pred))
 
+pixel.digit.lasso.cv <- cv.glmnet(as.matrix(digit.trainset[,-c(1)]), digit.trainset[,1], family="multinomial", type.measure="class")
+pixel.digit.lasso.cv.pred <- predict(pixel.digit.lasso.cv, as.matrix(digit.testset[,-c(1)]), type="class")
+pixel.digit.lasso.cv.pred.acc <- acc(table(digit.testset$label, pixel.digit.lasso.cv.pred))
+
+
 print("kNN")
 kNN <- nnExecAll(digit.trainset.features, 1:100)
+pixel.kNN <- nnExecAll(digit.trainset, 1:100)
 
 testset.knn <- knn(train = digit.trainset.features, test = digit.testset.features, cl = digit.trainset.features$label, k = 1)
 testset.confm <-  table(digit.testset.features$label, testset.knn)
 testset.knn.acc <- acc(testset.confm)
+
+pixel.testset.knn <- knn(train = digit.trainset, test = digit.testset, cl = digit.trainset$label, k = 1)
+pixel.testset.confm <-  table(digit.testset$label, pixel.testset.knn)
+pixel.testset.knn.acc <- acc(pixel.testset.confm)
 
 print("SVM")
 library(e1071)
@@ -116,9 +126,8 @@ svm.radial <- svm(label ~ ., data = digit.trainset.features, kernel = "radial")
 svm.radial.pred <-  predict(svm.radial, digit.testset.features[,-c(1)])
 svm.radial.pred.acc <- sum(diag(table(digit.testset.features$label,svm.radial.pred)))/nrow(digit.testset.features)
 #print("Tune Radial kernel")
-svm.radial.tune <- tune.svm(digit.trainset.features[, -c(1)],digit.trainset.features[,1],cost=c(1:25, 50, 10^(1:3)), gamma = c(10^(-5:3)))
-#optimal cost = 8, gamma = 0.1
-svm.radial.tuned <- svm(label ~ ., data = digit.trainset.features, cost = 8, gamma = 0.1)
+svm.radial.tune <- tune.svm(digit.trainset.features[, -c(1)],digit.trainset.features[,1],cost=c(1:25, 50, 10^(1:3)), gamma = c(2^(-10:4)))
+svm.radial.tuned <- svm(label ~ ., data = digit.trainset.features, cost = 13, gamma = 0.01)
 svm.radial.pred.tune <- predict(svm.radial.tuned, digit.testset.features[,-c(1)])
 svm.radial.pred.acc.tune <- sum(diag(table(digit.testset.features$label,svm.radial.pred.tune)))/nrow(digit.testset.features)
 
@@ -128,8 +137,30 @@ svm.linear.pred <-  predict(svm.linear, digit.testset.features[,-c(1)])
 svm.linear.pred.acc <- sum(diag(table(digit.testset.features$label,svm.linear.pred)))/nrow(digit.testset.features)
 #print("Tune linear kernel")
 svm.linear.tune <- tune.svm(digit.trainset.features[, -c(1)],digit.trainset.features[,1],cost=c(1:25, 50, 10^(1:3)))
-#optimal cost = 5
-svm.linear.tuned <- svm(label ~ ., data = digit.trainset.features, cost = 5)
+svm.linear.tuned <- svm(label ~ ., data = digit.trainset.features, cost = 20)
 svm.linear.pred.tune <- predict(svm.linear.tuned, digit.testset.features[,-c(1)])
 svm.linear.pred.acc.tune <- sum(diag(table(digit.testset.features$label,svm.linear.pred.tune)))/nrow(digit.testset.features)
+
+#PIXEL
+##Radial kernel
+print("Radial kernel")
+pixel.svm.radial <- svm(label ~ ., data = digit.trainset, kernel = "radial")
+pixel.svm.radial.pred <-  predict(pixel.svm.radial, digit.testset[,-c(1)])
+pixel.svm.radial.pred.acc <- sum(diag(table(digit.testset.$label,pixel.svm.radial.pred)))/nrow(digit.testset)
+#print("Tune Radial kernel")
+pixel.svm.radial.tune <- tune.svm(digit.trainset[, -c(1)],digit.trainset[,1],cost=c(1:25, 50, 10^(1:3)), gamma = c(2^(-10:4)))
+pixel.svm.radial.tuned <- svm(label ~ ., data = digit.trainset, cost = 13, gamma = 0.01)
+pixel.svm.radial.pred.tune <- predict(pixel.svm.radial.tuned, digit.testset[,-c(1)])
+pixel.svm.radial.pred.acc.tune <- sum(diag(table(digit.testset$label,pixel.svm.radial.pred.tune)))/nrow(digit.testset)
+
+print("Linear kernel")
+pixel.svm.linear <- svm(label ~ ., data = digit.trainset, kernel = "linear")
+pixel.svm.linear.pred <-  predict(svm.linear, digit.testset[,-c(1)])
+pixel.svm.linear.pred.acc <- sum(diag(table(digit.testset$label,svm.linear.pred)))/nrow(digit.testset.features)
+#print("Tune linear kernel")
+pixel.svm.linear.tune <- tune.svm(digit.trainset[, -c(1)],digit.trainset[,1],cost=c(1:25, 50, 10^(1:3)))
+pixel.svm.linear.tuned <- svm(label ~ ., data = digit.trainset, cost = 20)
+pixel.svm.linear.pred.tune <- predict(pixel.svm.linear.tuned, digit.testset[,-c(1)])
+pixel.svm.linear.pred.acc.tune <- sum(diag(table(digit.testset$label,pixel.svm.linear.pred.tune)))/nrow(digit.testset)
+
 print('Finished.')
