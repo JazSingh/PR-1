@@ -1,44 +1,44 @@
-# # COMPLETE CODE FOR PROJECT
-# print('Load dataset.')
-# source('functions.R')
-# digit.data <- read.csv("Dataset/mnist.csv")  # read csv file
-# 
-# # create train- and testset
-# set.seed(1)
-# sample <- splitData(digit.data, 1000)
-# digit.trainset <- digit.data[sample[1:1000],]
-# digit.testset <- digit.data[sample[1001:2000],]
-# 
-# print('Compute # of planes for trainset. (3-4 min max) grab a coffee in the meanwhile')
-# train.planes <- apply(digit.trainset, 1, getPlanes)
-# print('Compute # of planes for testset. (3-4 min max) grab a coffee in the meanwhile')
-# test.planes <- apply(digit.testset, 1, getPlanes)
-# 
-# print('Compute density of bounding box ratio for trainset.')
-# train.boundingboxratio <- apply(digit.trainset, 1, boundingBoxRatio)
-# print('Compute density ofbounding box ratio for testset.')
-# test.boundingboxratio <- apply(digit.testset, 1, boundingBoxRatio)
-# 
-# print('Compute pixel density.')
-# # add density feature to the dataset
-# train.density = apply(digit.trainset[,-c(1)], 1, mean)
-# test.density = apply(digit.testset[,-c(1)], 1, mean)
-# 
-# print('Create Data frames from calculated feature data.')
-# digit.trainset.features <- data.frame(label = digit.trainset$label, boundingboxratio = train.boundingboxratio, density = train.density, planes = train.planes)
-# digit.testset.features <- data.frame(label = digit.testset$label, boundingboxratio = test.boundingboxratio, density = test.density, planes = test.planes)
-# 
-# # create a factor of $label
-# digit.data$label = as.factor(digit.data$label)
-# digit.trainset$label = as.factor(digit.trainset$label)
-# digit.testset$label = as.factor(digit.testset$label)
-# digit.trainset.features$label = as.factor(digit.trainset.features$label)
-# digit.testset.features$label = as.factor(digit.testset.features$label)
-# 
-# print('Compute which pixels are irrelevant and remove them from the train- and testset. (max == 0)')
-# feature.filter <- which(apply(digit.data, 2, max) == 0)
-# digit.trainset <- digit.trainset[,-c(feature.filter)]
-# digit.testset <- digit.testset[,-c(feature.filter)]
+# COMPLETE CODE FOR PROJECT
+print('Load dataset.')
+source('functions.R')
+digit.data <- read.csv("Dataset/mnist.csv")  # read csv file
+
+# create train- and testset
+set.seed(1)
+sample <- splitData(digit.data, 1000)
+digit.trainset <- digit.data[sample[1:1000],]
+digit.testset <- digit.data[sample[1001:2000],]
+
+print('Compute # of planes for trainset. (3-4 min max) grab a coffee in the meanwhile')
+train.planes <- apply(digit.trainset, 1, getPlanes)
+print('Compute # of planes for testset. (3-4 min max) grab a coffee in the meanwhile')
+test.planes <- apply(digit.testset, 1, getPlanes)
+
+print('Compute density of bounding box ratio for trainset.')
+train.boundingboxratio <- apply(digit.trainset, 1, boundingBoxRatio)
+print('Compute density ofbounding box ratio for testset.')
+test.boundingboxratio <- apply(digit.testset, 1, boundingBoxRatio)
+
+print('Compute pixel density.')
+# add density feature to the dataset
+train.density = apply(digit.trainset[,-c(1)], 1, mean)
+test.density = apply(digit.testset[,-c(1)], 1, mean)
+
+print('Create Data frames from calculated feature data.')
+digit.trainset.features <- data.frame(label = digit.trainset$label, boundingboxratio = train.boundingboxratio, density = train.density, planes = train.planes)
+digit.testset.features <- data.frame(label = digit.testset$label, boundingboxratio = test.boundingboxratio, density = test.density, planes = test.planes)
+
+# create a factor of $label
+digit.data$label = as.factor(digit.data$label)
+digit.trainset$label = as.factor(digit.trainset$label)
+digit.testset$label = as.factor(digit.testset$label)
+digit.trainset.features$label = as.factor(digit.trainset.features$label)
+digit.testset.features$label = as.factor(digit.testset.features$label)
+
+print('Compute which pixels are irrelevant and remove them from the train- and testset. (max == 0)')
+feature.filter <- which(apply(digit.data, 2, max) == 0)
+digit.trainset <- digit.trainset[,-c(feature.filter)]
+digit.testset <- digit.testset[,-c(feature.filter)]
 
 library(nnet)
 print("Multinomial classification")
@@ -126,7 +126,7 @@ svm.radial <- svm(label ~ ., data = digit.trainset.features, kernel = "radial")
 svm.radial.pred <-  predict(svm.radial, digit.testset.features[,-c(1)])
 svm.radial.pred.acc <- sum(diag(table(digit.testset.features$label,svm.radial.pred)))/nrow(digit.testset.features)
 #print("Tune Radial kernel")
-svm.radial.tune <- tune.svm(digit.trainset.features[, -c(1)],digit.trainset.features[,1],cost=c(1:25, 50, 10^(1:3)), gamma = c(2^(-10:4)))
+svm.radial.tune <- tune.svm(digit.trainset.features[, -c(1)],digit.trainset.features[,1],cost=c(1:25, 50, 10^(1:3)), gamma = c(2^(-10:3)))
 svm.radial.tuned <- svm(label ~ ., data = digit.trainset.features, cost = 13, gamma = 0.01)
 svm.radial.pred.tune <- predict(svm.radial.tuned, digit.testset.features[,-c(1)])
 svm.radial.pred.acc.tune <- sum(diag(table(digit.testset.features$label,svm.radial.pred.tune)))/nrow(digit.testset.features)
@@ -141,25 +141,24 @@ svm.linear.tuned <- svm(label ~ ., data = digit.trainset.features, cost = 20)
 svm.linear.pred.tune <- predict(svm.linear.tuned, digit.testset.features[,-c(1)])
 svm.linear.pred.acc.tune <- sum(diag(table(digit.testset.features$label,svm.linear.pred.tune)))/nrow(digit.testset.features)
 
-#PIXEL
-##Radial kernel
+#Radial kernel
 print("Radial kernel")
 pixel.svm.radial <- svm(label ~ ., data = digit.trainset, kernel = "radial")
 pixel.svm.radial.pred <-  predict(pixel.svm.radial, digit.testset[,-c(1)])
-pixel.svm.radial.pred.acc <- sum(diag(table(digit.testset.$label,pixel.svm.radial.pred)))/nrow(digit.testset)
-#print("Tune Radial kernel")
-pixel.svm.radial.tune <- tune.svm(digit.trainset[, -c(1)],digit.trainset[,1],cost=c(1:25, 50, 10^(1:3)), gamma = c(2^(-10:4)))
-pixel.svm.radial.tuned <- svm(label ~ ., data = digit.trainset, cost = 13, gamma = 0.01)
+pixel.svm.radial.pred.acc <- sum(diag(table(digit.testset$label,pixel.svm.radial.pred)))/nrow(digit.testset)
+print("Tune Radial kernel")
+#pixel.svm.radial.tune <- tune.svm(digit.trainset[, -c(1)],digit.trainset[,1],cost=c(2^(0:5)), gamma = c(2^(-8:0)))
+pixel.svm.radial.tuned <- svm(label ~ ., data = digit.trainset, cost = 1, gamma = 0.00390625)
 pixel.svm.radial.pred.tune <- predict(pixel.svm.radial.tuned, digit.testset[,-c(1)])
 pixel.svm.radial.pred.acc.tune <- sum(diag(table(digit.testset$label,pixel.svm.radial.pred.tune)))/nrow(digit.testset)
 
 print("Linear kernel")
 pixel.svm.linear <- svm(label ~ ., data = digit.trainset, kernel = "linear")
-pixel.svm.linear.pred <-  predict(svm.linear, digit.testset[,-c(1)])
+pixel.svm.linear.pred <-  predict(pixel.svm.linear, digit.testset[,-c(1)])
 pixel.svm.linear.pred.acc <- sum(diag(table(digit.testset$label,svm.linear.pred)))/nrow(digit.testset.features)
 #print("Tune linear kernel")
-pixel.svm.linear.tune <- tune.svm(digit.trainset[, -c(1)],digit.trainset[,1],cost=c(1:25, 50, 10^(1:3)))
-pixel.svm.linear.tuned <- svm(label ~ ., data = digit.trainset, cost = 20)
+#pixel.svm.linear.tune <- tune.svm(digit.trainset[, -c(1)],digit.trainset[,1],cost=c(2^(0:9)))
+pixel.svm.linear.tuned <- svm(label ~ ., data = digit.trainset, cost = 1)
 pixel.svm.linear.pred.tune <- predict(pixel.svm.linear.tuned, digit.testset[,-c(1)])
 pixel.svm.linear.pred.acc.tune <- sum(diag(table(digit.testset$label,pixel.svm.linear.pred.tune)))/nrow(digit.testset)
 
