@@ -146,7 +146,7 @@ pixel.svm.linear.pred <-  predict(pixel.svm.linear, digit.testset[,-c(1)])
 pixel.svm.linear.pred.acc <- sum(diag(table(digit.testset$label,pixel.svm.linear.pred)))/nrow(digit.testset)
 print("P: Tune linear kernel")
 pixel.svm.linear.tune <- tune.svm(digit.trainset[, -c(1)],digit.trainset[,1],cost=c(2^(-10:5)), kernel = "linear")
-pixel.svm.linear.tuned <- svm(label ~ ., data = digit.trainset, cost =  0.0009765625, gamma = 0.001412429 , kernel = "linear")
+pixel.svm.linear.tuned <- svm(label ~ ., data = digit.trainset, cost =  0.0009765625, kernel = "linear")
 pixel.svm.linear.pred.tune <- predict(pixel.svm.linear.tuned, digit.testset[,-c(1)])
 pixel.svm.linear.pred.acc.tune <- sum(diag(table(digit.testset$label,pixel.svm.linear.pred.tune)))/nrow(digit.testset)
 
