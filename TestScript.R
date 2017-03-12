@@ -118,15 +118,26 @@ for(kk in ks)
   testset.knn <- knn(train = digit.trainset.features[,c(-1)], test = digit.testset.features[,c(-1)], cl = digit.trainset.features$label, k = kk)
   testset.confm <-  table(digit.testset.features$label, testset.knn)
   testset.knn.acc <- acc(testset.confm)
+  
   test.knn.accs <- c(test.knn.accs, testset.knn.acc)
   ktjes <- c(ktjes,kk)
 }
 
 knn.results <- data.frame(ktjes, test.knn.accs)
 
-pixel.testset.knn <- knn(train = digit.trainset[,c(-1)], test = digit.testset[,c(-1)], cl = digit.trainset$label, k = 12)
+pxs <- 1:100
+test.pixel.knn.accs <- c()
+pk <- c()
+for(px in pxs) 
+{
+pixel.testset.knn <- knn(train = digit.trainset[,c(-1)], test = digit.testset[,c(-1)], cl = digit.trainset$label, k = px)
 pixel.testset.confm <-  table(digit.testset$label, pixel.testset.knn)
 pixel.testset.knn.acc <- acc(pixel.testset.confm)
+
+test.pixel.knn.accs <- c(test.pixel.knn.accs, pixel.testset.knn.acc)
+pk <- c(pk, px)
+}
+knn.pixel.results <- data.frame(pk, test.pixel.knn.accs)
 
 print("SVM")
 library(e1071)
